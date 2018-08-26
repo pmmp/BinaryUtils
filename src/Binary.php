@@ -27,7 +27,7 @@ declare(strict_types=1);
 namespace pocketmine\utils;
 
 if(!defined("ENDIANNESS")){
-	define("ENDIANNESS", (pack("d", 1) === "\77\360\0\0\0\0\0\0" ? Binary::BIG_ENDIAN : Binary::LITTLE_ENDIAN));
+	define("ENDIANNESS", (pack("s", 1) === "\0\1" ? Binary::BIG_ENDIAN : Binary::LITTLE_ENDIAN));
 }
 
 class Binary{
