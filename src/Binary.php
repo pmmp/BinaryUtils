@@ -440,7 +440,7 @@ class Binary{
 	 *
 	 * @return int
 	 *
-	 * @throws \InvalidArgumentException if the var-int did not end after 5 bytes
+	 * @throws \OutOfBoundsException if the var-int did not end after 5 bytes or there were not enough bytes
 	 */
 	public static function readUnsignedVarInt(string $buffer, int &$offset) : int{
 		$value = 0;
@@ -451,11 +451,11 @@ class Binary{
 			if(($b & 0x80) === 0){
 				return $value;
 			}elseif(!isset($buffer{$offset})){
-				throw new \UnexpectedValueException("Expected more bytes, none left to read");
+				throw new \OutOfBoundsException("Expected more bytes, none left to read");
 			}
 		}
 
-		throw new \InvalidArgumentException("VarInt did not terminate after 5 bytes!");
+		throw new \OutOfBoundsException("VarInt did not terminate after 5 bytes!");
 	}
 
 	/**
@@ -514,6 +514,8 @@ class Binary{
 	 * @param int    &$offset
 	 *
 	 * @return int
+	 *
+	 * @throws \OutOfBoundsException if the var-int did not end after 10 bytes or there were not enough bytes
 	 */
 	public static function readUnsignedVarLong(string $buffer, int &$offset) : int{
 		$value = 0;
@@ -524,11 +526,11 @@ class Binary{
 			if(($b & 0x80) === 0){
 				return $value;
 			}elseif(!isset($buffer{$offset})){
-				throw new \UnexpectedValueException("Expected more bytes, none left to read");
+				throw new \OutOfBoundsException("Expected more bytes, none left to read");
 			}
 		}
 
-		throw new \InvalidArgumentException("VarLong did not terminate after 10 bytes!");
+		throw new \OutOfBoundsException("VarLong did not terminate after 10 bytes!");
 	}
 
 	/**
