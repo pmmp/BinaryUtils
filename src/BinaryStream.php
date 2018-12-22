@@ -106,7 +106,7 @@ class BinaryStream{
 
 
 	public function getByte() : int{
-		return ord($this->buffer{$this->offset++});
+		return ord($this->get(1));
 	}
 
 	public function putByte(int $v){
