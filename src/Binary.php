@@ -444,7 +444,7 @@ class Binary{
 	 */
 	public static function readUnsignedVarInt(string $buffer, int &$offset) : int{
 		$value = 0;
-		for($i = 0; $i <= 35; $i += 7){
+		for($i = 0; $i <= 28; $i += 7){
 			$b = ord($buffer{$offset++});
 			$value |= (($b & 0x7f) << $i);
 
