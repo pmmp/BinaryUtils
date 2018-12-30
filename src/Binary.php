@@ -445,13 +445,14 @@ class Binary{
 	public static function readUnsignedVarInt(string $buffer, int &$offset) : int{
 		$value = 0;
 		for($i = 0; $i <= 28; $i += 7){
+			if(!isset($buffer{$offset})){
+				throw new \OutOfBoundsException("No bytes left in buffer");
+			}
 			$b = ord($buffer{$offset++});
 			$value |= (($b & 0x7f) << $i);
 
 			if(($b & 0x80) === 0){
 				return $value;
-			}elseif(!isset($buffer{$offset})){
-				throw new \OutOfBoundsException("Expected more bytes, none left to read");
 			}
 		}
 
@@ -520,13 +521,14 @@ class Binary{
 	public static function readUnsignedVarLong(string $buffer, int &$offset) : int{
 		$value = 0;
 		for($i = 0; $i <= 63; $i += 7){
+			if(!isset($buffer{$offset})){
+				throw new \OutOfBoundsException("No bytes left in buffer");
+			}
 			$b = ord($buffer{$offset++});
 			$value |= (($b & 0x7f) << $i);
 
 			if(($b & 0x80) === 0){
 				return $value;
-			}elseif(!isset($buffer{$offset})){
-				throw new \OutOfBoundsException("Expected more bytes, none left to read");
 			}
 		}
 
