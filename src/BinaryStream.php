@@ -28,9 +28,9 @@ namespace pocketmine\utils;
 class BinaryStream{
 
 	/** @var int */
-	public $offset;
+	protected $offset;
 	/** @var string */
-	public $buffer;
+	protected $buffer;
 
 	public function __construct(string $buffer = "", int $offset = 0){
 		$this->buffer = $buffer;
