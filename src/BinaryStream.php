@@ -25,6 +25,12 @@ namespace pocketmine\utils;
 
 #include <rules/BinaryIO.h>
 
+use OutOfBoundsException;
+use function chr;
+use function ord;
+use function strlen;
+use function substr;
+
 class BinaryStream{
 
 	/** @var int */
@@ -67,7 +73,7 @@ class BinaryStream{
 	 *
 	 * @return string
 	 *
-	 * @throws \OutOfBoundsException if there are not enough bytes left in the buffer
+	 * @throws OutOfBoundsException if there are not enough bytes left in the buffer
 	 */
 	public function get($len) : string{
 		if($len === 0){
@@ -86,7 +92,7 @@ class BinaryStream{
 		}
 		$remaining = $buflen - $this->offset;
 		if($remaining < $len){
-			throw new \OutOfBoundsException("Not enough bytes left in buffer: need $len, have $remaining");
+			throw new OutOfBoundsException("Not enough bytes left in buffer: need $len, have $remaining");
 		}
 
 		return $len === 1 ? $this->buffer{$this->offset++} : substr($this->buffer, ($this->offset += $len) - $len, $len);
