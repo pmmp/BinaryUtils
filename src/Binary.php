@@ -26,6 +26,20 @@ declare(strict_types=1);
  */
 namespace pocketmine\utils;
 
+use InvalidArgumentException;
+use OutOfBoundsException;
+use function chr;
+use function define;
+use function defined;
+use function ord;
+use function pack;
+use function preg_replace;
+use function round;
+use function sprintf;
+use function substr;
+use function unpack;
+use const PHP_INT_MAX;
+
 if(!defined("ENDIANNESS")){
 	define("ENDIANNESS", (pack("s", 1) === "\0\1" ? Binary::BIG_ENDIAN : Binary::LITTLE_ENDIAN));
 }
@@ -440,13 +454,13 @@ class Binary{
 	 *
 	 * @return int
 	 *
-	 * @throws \OutOfBoundsException if the var-int did not end after 5 bytes or there were not enough bytes
+	 * @throws OutOfBoundsException if the var-int did not end after 5 bytes or there were not enough bytes
 	 */
 	public static function readUnsignedVarInt(string $buffer, int &$offset) : int{
 		$value = 0;
 		for($i = 0; $i <= 28; $i += 7){
 			if(!isset($buffer{$offset})){
-				throw new \OutOfBoundsException("No bytes left in buffer");
+				throw new OutOfBoundsException("No bytes left in buffer");
 			}
 			$b = ord($buffer{$offset++});
 			$value |= (($b & 0x7f) << $i);
@@ -456,7 +470,7 @@ class Binary{
 			}
 		}
 
-		throw new \OutOfBoundsException("VarInt did not terminate after 5 bytes!");
+		throw new OutOfBoundsException("VarInt did not terminate after 5 bytes!");
 	}
 
 	/**
@@ -490,7 +504,7 @@ class Binary{
 			$value = (($value >> 7) & (PHP_INT_MAX >> 6)); //PHP really needs a logical right-shift operator
 		}
 
-		throw new \InvalidArgumentException("Value too large to be encoded as a VarInt");
+		throw new InvalidArgumentException("Value too large to be encoded as a VarInt");
 	}
 
 
@@ -516,13 +530,13 @@ class Binary{
 	 *
 	 * @return int
 	 *
-	 * @throws \OutOfBoundsException if the var-int did not end after 10 bytes or there were not enough bytes
+	 * @throws OutOfBoundsException if the var-int did not end after 10 bytes or there were not enough bytes
 	 */
 	public static function readUnsignedVarLong(string $buffer, int &$offset) : int{
 		$value = 0;
 		for($i = 0; $i <= 63; $i += 7){
 			if(!isset($buffer{$offset})){
-				throw new \OutOfBoundsException("No bytes left in buffer");
+				throw new OutOfBoundsException("No bytes left in buffer");
 			}
 			$b = ord($buffer{$offset++});
 			$value |= (($b & 0x7f) << $i);
@@ -532,7 +546,7 @@ class Binary{
 			}
 		}
 
-		throw new \OutOfBoundsException("VarLong did not terminate after 10 bytes!");
+		throw new OutOfBoundsException("VarLong did not terminate after 10 bytes!");
 	}
 
 	/**
@@ -564,6 +578,6 @@ class Binary{
 			$value = (($value >> 7) & (PHP_INT_MAX >> 6)); //PHP really needs a logical right-shift operator
 		}
 
-		throw new \InvalidArgumentException("Value too large to be encoded as a VarLong");
+		throw new InvalidArgumentException("Value too large to be encoded as a VarLong");
 	}
 }
