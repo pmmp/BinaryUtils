@@ -73,28 +73,21 @@ class BinaryStream{
 	}
 
 	/**
-	 * @param int|bool $len
+	 * @param int $len
 	 *
 	 * @return string
 	 *
 	 * @throws OutOfBoundsException if there are not enough bytes left in the buffer
 	 */
-	public function get($len) : string{
+	public function get(int $len) : string{
 		if($len === 0){
 			return "";
 		}
-
-		$buflen = strlen($this->buffer);
-		if($len === true){
-			$str = substr($this->buffer, $this->offset);
-			$this->offset = $buflen;
-			return $str;
-		}
 		if($len < 0){
-			$this->offset = $buflen - 1;
-			return "";
+			throw new \InvalidArgumentException("Length must be positive");
 		}
-		$remaining = $buflen - $this->offset;
+
+		$remaining = strlen($this->buffer) - $this->offset;
 		if($remaining < $len){
 			throw new OutOfBoundsException("Not enough bytes left in buffer: need $len, have $remaining");
 		}
