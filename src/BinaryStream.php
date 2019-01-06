@@ -100,6 +100,9 @@ class BinaryStream{
 
 	public function getRemaining() : string{
 		$str = substr($this->buffer, $this->offset);
+		if($str === false){
+			throw new OutOfBoundsException("No bytes left to read");
+		}
 		$this->offset = strlen($this->buffer);
 		return $str;
 	}
