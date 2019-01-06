@@ -55,6 +55,10 @@ class BinaryStream{
 		$this->offset = 0;
 	}
 
+	public function setOffset(int $offset) : void{
+		$this->offset = $offset;
+	}
+
 	public function setBuffer(string $buffer = "", int $offset = 0){
 		$this->buffer = $buffer;
 		$this->offset = $offset;
