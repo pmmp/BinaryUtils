@@ -217,6 +217,21 @@ class BinaryStream{
 		$this->buffer .= Binary::writeLFloat($v);
 	}
 
+	public function getDouble() : float{
+		return Binary::readDouble($this->get(8));
+	}
+
+	public function putDouble(float $v) : void{
+		$this->buffer .= Binary::writeDouble($v);
+	}
+
+	public function getLDouble() : float{
+		return Binary::readLDouble($this->get(8));
+	}
+
+	public function putLDouble(float $v) : void{
+		$this->buffer .= Binary::writeLDouble($v);
+	}
 
 	/**
 	 * @return int
