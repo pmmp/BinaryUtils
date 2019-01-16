@@ -27,7 +27,6 @@ declare(strict_types=1);
 namespace pocketmine\utils;
 
 use InvalidArgumentException;
-use OutOfBoundsException;
 use function chr;
 use function define;
 use function defined;
@@ -484,13 +483,13 @@ class Binary{
 	 *
 	 * @return int
 	 *
-	 * @throws OutOfBoundsException if the var-int did not end after 5 bytes or there were not enough bytes
+	 * @throws BinaryDataException if the var-int did not end after 5 bytes or there were not enough bytes
 	 */
 	public static function readUnsignedVarInt(string $buffer, int &$offset) : int{
 		$value = 0;
 		for($i = 0; $i <= 28; $i += 7){
 			if(!isset($buffer{$offset})){
-				throw new OutOfBoundsException("No bytes left in buffer");
+				throw new BinaryDataException("No bytes left in buffer");
 			}
 			$b = ord($buffer{$offset++});
 			$value |= (($b & 0x7f) << $i);
@@ -500,7 +499,7 @@ class Binary{
 			}
 		}
 
-		throw new OutOfBoundsException("VarInt did not terminate after 5 bytes!");
+		throw new BinaryDataException("VarInt did not terminate after 5 bytes!");
 	}
 
 	/**
@@ -562,13 +561,13 @@ class Binary{
 	 *
 	 * @return int
 	 *
-	 * @throws OutOfBoundsException if the var-int did not end after 10 bytes or there were not enough bytes
+	 * @throws BinaryDataException if the var-int did not end after 10 bytes or there were not enough bytes
 	 */
 	public static function readUnsignedVarLong(string $buffer, int &$offset) : int{
 		$value = 0;
 		for($i = 0; $i <= 63; $i += 7){
 			if(!isset($buffer{$offset})){
-				throw new OutOfBoundsException("No bytes left in buffer");
+				throw new BinaryDataException("No bytes left in buffer");
 			}
 			$b = ord($buffer{$offset++});
 			$value |= (($b & 0x7f) << $i);
@@ -578,7 +577,7 @@ class Binary{
 			}
 		}
 
-		throw new OutOfBoundsException("VarLong did not terminate after 10 bytes!");
+		throw new BinaryDataException("VarLong did not terminate after 10 bytes!");
 	}
 
 	/**
