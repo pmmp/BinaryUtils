@@ -98,7 +98,7 @@ class BinaryStream{
 			throw new BinaryDataException("Not enough bytes left in buffer: need $len, have $remaining");
 		}
 
-		return $len === 1 ? $this->buffer{$this->offset++} : substr($this->buffer, ($this->offset += $len) - $len, $len);
+		return $len === 1 ? $this->buffer[$this->offset++] : substr($this->buffer, ($this->offset += $len) - $len, $len);
 	}
 
 	/**
@@ -333,6 +333,6 @@ class BinaryStream{
 	 * @return bool
 	 */
 	public function feof() : bool{
-		return !isset($this->buffer{$this->offset});
+		return !isset($this->buffer[$this->offset]);
 	}
 }

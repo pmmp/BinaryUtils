@@ -114,7 +114,7 @@ class Binary{
 	 * @return int
 	 */
 	public static function readByte(string $c) : int{
-		return ord($c{0});
+		return ord($c[0]);
 	}
 
 	/**
@@ -125,7 +125,7 @@ class Binary{
 	 * @return int
 	 */
 	public static function readSignedByte(string $c) : int{
-		return self::signByte(ord($c{0}));
+		return self::signByte(ord($c[0]));
 	}
 
 	/**
@@ -488,10 +488,10 @@ class Binary{
 	public static function readUnsignedVarInt(string $buffer, int &$offset) : int{
 		$value = 0;
 		for($i = 0; $i <= 28; $i += 7){
-			if(!isset($buffer{$offset})){
+			if(!isset($buffer[$offset])){
 				throw new BinaryDataException("No bytes left in buffer");
 			}
-			$b = ord($buffer{$offset++});
+			$b = ord($buffer[$offset++]);
 			$value |= (($b & 0x7f) << $i);
 
 			if(($b & 0x80) === 0){
@@ -566,10 +566,10 @@ class Binary{
 	public static function readUnsignedVarLong(string $buffer, int &$offset) : int{
 		$value = 0;
 		for($i = 0; $i <= 63; $i += 7){
-			if(!isset($buffer{$offset})){
+			if(!isset($buffer[$offset])){
 				throw new BinaryDataException("No bytes left in buffer");
 			}
-			$b = ord($buffer{$offset++});
+			$b = ord($buffer[$offset++]);
 			$value |= (($b & 0x7f) << $i);
 
 			if(($b & 0x80) === 0){
