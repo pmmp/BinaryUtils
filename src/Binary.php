@@ -153,7 +153,7 @@ class Binary{
 	/**
 	 * Reads a 16-bit signed big-endian number
 	 *
-	 * @param $str
+	 * @param string $str
 	 *
 	 * @return int
 	 */
