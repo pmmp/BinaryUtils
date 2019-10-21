@@ -322,7 +322,7 @@ class BinaryStream{
 
 	/**
 	 * Writes a 64-bit zigzag-encoded variable-length integer to the end of the buffer.
-	 * @param int
+	 * @param int $v
 	 */
 	public function putVarLong(int $v){
 		$this->buffer .= Binary::writeVarLong($v);
