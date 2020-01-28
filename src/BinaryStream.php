@@ -78,7 +78,7 @@ class BinaryStream{
 	}
 
 	/**
-	 * @param int|bool $len
+	 * @param int|true $len
 	 *
 	 * @return string
 	 *
