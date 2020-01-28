@@ -42,6 +42,9 @@ class BinaryStream{
 		$this->offset = $offset;
 	}
 
+	/**
+	 * @return void
+	 */
 	public function reset(){
 		$this->buffer = "";
 		$this->offset = 0;
@@ -58,6 +61,9 @@ class BinaryStream{
 		$this->offset = $offset;
 	}
 
+	/**
+	 * @return void
+	 */
 	public function setBuffer(string $buffer = "", int $offset = 0){
 		$this->buffer = $buffer;
 		$this->offset = $offset;
@@ -115,6 +121,9 @@ class BinaryStream{
 		return $str;
 	}
 
+	/**
+	 * @return void
+	 */
 	public function put(string $str){
 		$this->buffer .= $str;
 	}
@@ -124,6 +133,9 @@ class BinaryStream{
 		return $this->get(1) !== "\x00";
 	}
 
+	/**
+	 * @return void
+	 */
 	public function putBool(bool $v){
 		$this->buffer .= ($v ? "\x01" : "\x00");
 	}
@@ -133,6 +145,9 @@ class BinaryStream{
 		return ord($this->get(1));
 	}
 
+	/**
+	 * @return void
+	 */
 	public function putByte(int $v){
 		$this->buffer .= chr($v);
 	}
@@ -146,6 +161,9 @@ class BinaryStream{
 		return Binary::readSignedShort($this->get(2));
 	}
 
+	/**
+	 * @return void
+	 */
 	public function putShort(int $v){
 		$this->buffer .= Binary::writeShort($v);
 	}
@@ -158,6 +176,9 @@ class BinaryStream{
 		return Binary::readSignedLShort($this->get(2));
 	}
 
+	/**
+	 * @return void
+	 */
 	public function putLShort(int $v){
 		$this->buffer .= Binary::writeLShort($v);
 	}
@@ -167,6 +188,9 @@ class BinaryStream{
 		return Binary::readTriad($this->get(3));
 	}
 
+	/**
+	 * @return void
+	 */
 	public function putTriad(int $v){
 		$this->buffer .= Binary::writeTriad($v);
 	}
@@ -175,6 +199,9 @@ class BinaryStream{
 		return Binary::readLTriad($this->get(3));
 	}
 
+	/**
+	 * @return void
+	 */
 	public function putLTriad(int $v){
 		$this->buffer .= Binary::writeLTriad($v);
 	}
@@ -184,6 +211,9 @@ class BinaryStream{
 		return Binary::readInt($this->get(4));
 	}
 
+	/**
+	 * @return void
+	 */
 	public function putInt(int $v){
 		$this->buffer .= Binary::writeInt($v);
 	}
@@ -192,6 +222,9 @@ class BinaryStream{
 		return Binary::readLInt($this->get(4));
 	}
 
+	/**
+	 * @return void
+	 */
 	public function putLInt(int $v){
 		$this->buffer .= Binary::writeLInt($v);
 	}
@@ -205,6 +238,9 @@ class BinaryStream{
 		return Binary::readRoundedFloat($this->get(4), $accuracy);
 	}
 
+	/**
+	 * @return void
+	 */
 	public function putFloat(float $v){
 		$this->buffer .= Binary::writeFloat($v);
 	}
@@ -217,6 +253,9 @@ class BinaryStream{
 		return Binary::readRoundedLFloat($this->get(4), $accuracy);
 	}
 
+	/**
+	 * @return void
+	 */
 	public function putLFloat(float $v){
 		$this->buffer .= Binary::writeLFloat($v);
 	}
@@ -246,6 +285,8 @@ class BinaryStream{
 
 	/**
 	 * @param int $v
+	 *
+	 * @return void
 	 */
 	public function putLong(int $v){
 		$this->buffer .= Binary::writeLong($v);
@@ -260,6 +301,8 @@ class BinaryStream{
 
 	/**
 	 * @param int $v
+	 *
+	 * @return void
 	 */
 	public function putLLong(int $v){
 		$this->buffer .= Binary::writeLLong($v);
@@ -276,6 +319,8 @@ class BinaryStream{
 	/**
 	 * Writes a 32-bit variable-length unsigned integer to the end of the buffer.
 	 * @param int $v
+	 *
+	 * @return void
 	 */
 	public function putUnsignedVarInt(int $v){
 		$this->put(Binary::writeUnsignedVarInt($v));
@@ -292,6 +337,8 @@ class BinaryStream{
 	/**
 	 * Writes a 32-bit zigzag-encoded variable-length integer to the end of the buffer.
 	 * @param int $v
+	 *
+	 * @return void
 	 */
 	public function putVarInt(int $v){
 		$this->put(Binary::writeVarInt($v));
@@ -308,6 +355,8 @@ class BinaryStream{
 	/**
 	 * Writes a 64-bit variable-length integer to the end of the buffer.
 	 * @param int $v
+	 *
+	 * @return void
 	 */
 	public function putUnsignedVarLong(int $v){
 		$this->buffer .= Binary::writeUnsignedVarLong($v);
@@ -324,6 +373,8 @@ class BinaryStream{
 	/**
 	 * Writes a 64-bit zigzag-encoded variable-length integer to the end of the buffer.
 	 * @param int $v
+	 *
+	 * @return void
 	 */
 	public function putVarLong(int $v){
 		$this->buffer .= Binary::writeVarLong($v);
