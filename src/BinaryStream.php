@@ -42,11 +42,6 @@ class BinaryStream{
 		$this->offset = $offset;
 	}
 
-	public function reset() : void{
-		$this->buffer = "";
-		$this->offset = 0;
-	}
-
 	/**
 	 * Rewinds the stream pointer to the start.
 	 */
@@ -55,11 +50,6 @@ class BinaryStream{
 	}
 
 	public function setOffset(int $offset) : void{
-		$this->offset = $offset;
-	}
-
-	public function setBuffer(string $buffer = "", int $offset = 0) : void{
-		$this->buffer = $buffer;
 		$this->offset = $offset;
 	}
 
