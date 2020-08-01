@@ -71,7 +71,6 @@ class Binary{
 		return $value & 0xffffffff;
 	}
 
-
 	public static function flipShortEndianness(int $value) : int{
 		return self::readLShort(self::writeShort($value));
 	}
@@ -386,7 +385,6 @@ class Binary{
 
 		throw new InvalidArgumentException("Value too large to be encoded as a VarInt");
 	}
-
 
 	/**
 	 * Reads a 64-bit zigzag-encoded variable-length integer.

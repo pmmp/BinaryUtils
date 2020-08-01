@@ -125,7 +125,6 @@ class BinaryStream{
 		$this->buffer .= $str;
 	}
 
-
 	public function getBool() : bool{
 		return $this->get(1) !== "\x00";
 	}
@@ -137,7 +136,6 @@ class BinaryStream{
 		$this->buffer .= ($v ? "\x01" : "\x00");
 	}
 
-
 	public function getByte() : int{
 		return ord($this->get(1));
 	}
@@ -148,7 +146,6 @@ class BinaryStream{
 	public function putByte(int $v){
 		$this->buffer .= chr($v);
 	}
-
 
 	public function getShort() : int{
 		return Binary::readShort($this->get(2));
@@ -180,7 +177,6 @@ class BinaryStream{
 		$this->buffer .= Binary::writeLShort($v);
 	}
 
-
 	public function getTriad() : int{
 		return Binary::readTriad($this->get(3));
 	}
@@ -203,7 +199,6 @@ class BinaryStream{
 		$this->buffer .= Binary::writeLTriad($v);
 	}
 
-
 	public function getInt() : int{
 		return Binary::readInt($this->get(4));
 	}
@@ -225,7 +220,6 @@ class BinaryStream{
 	public function putLInt(int $v){
 		$this->buffer .= Binary::writeLInt($v);
 	}
-
 
 	public function getFloat() : float{
 		return Binary::readFloat($this->get(4));
