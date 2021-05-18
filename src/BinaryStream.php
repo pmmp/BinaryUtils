@@ -32,10 +32,8 @@ use function substr;
 
 class BinaryStream{
 
-	/** @var int */
-	protected $offset;
-	/** @var string */
-	protected $buffer;
+	protected int $offset;
+	protected string $buffer;
 
 	public function __construct(string $buffer = "", int $offset = 0){
 		$this->buffer = $buffer;
