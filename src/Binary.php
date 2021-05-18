@@ -28,8 +28,6 @@ namespace pocketmine\utils;
 
 use InvalidArgumentException;
 use function chr;
-use function define;
-use function defined;
 use function ord;
 use function pack;
 use function preg_replace;
@@ -39,14 +37,7 @@ use function substr;
 use function unpack;
 use const PHP_INT_MAX;
 
-if(!defined("ENDIANNESS")){
-	define("ENDIANNESS", (pack("s", 1) === "\0\1" ? Binary::BIG_ENDIAN : Binary::LITTLE_ENDIAN));
-}
-
 class Binary{
-	public const BIG_ENDIAN = 0x00;
-	public const LITTLE_ENDIAN = 0x01;
-
 	public static function signByte(int $value) : int{
 		return $value << 56 >> 56;
 	}
