@@ -31,9 +31,12 @@ use function strlen;
 use function substr;
 
 class BinaryStream{
+	//TODO: use typed properties when https://bugs.php.net/bug.php?id=81090 is fixed
 
-	protected int $offset;
-	protected string $buffer;
+	/** @var int */
+	protected $offset;
+	/** @var string */
+	protected $buffer;
 
 	public function __construct(string $buffer = "", int $offset = 0){
 		$this->buffer = $buffer;
