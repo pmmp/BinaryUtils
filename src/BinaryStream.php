@@ -63,6 +63,7 @@ class BinaryStream{
 	}
 
 	/**
+	 * @phpstan-impure
 	 * @throws BinaryDataException if there are not enough bytes left in the buffer
 	 */
 	public function get(int $len) : string{
@@ -82,6 +83,7 @@ class BinaryStream{
 	}
 
 	/**
+	 * @phpstan-impure
 	 * @throws BinaryDataException
 	 */
 	public function getRemaining() : string{
@@ -98,6 +100,9 @@ class BinaryStream{
 		$this->buffer .= $str;
 	}
 
+	/**
+	 * @phpstan-impure
+	 */
 	public function getBool() : bool{
 		return $this->get(1) !== "\x00";
 	}
@@ -106,6 +111,9 @@ class BinaryStream{
 		$this->buffer .= ($v ? "\x01" : "\x00");
 	}
 
+	/**
+	 * @phpstan-impure
+	 */
 	public function getByte() : int{
 		return ord($this->get(1));
 	}
@@ -114,10 +122,16 @@ class BinaryStream{
 		$this->buffer .= chr($v);
 	}
 
+	/**
+	 * @phpstan-impure
+	 */
 	public function getShort() : int{
 		return Binary::readShort($this->get(2));
 	}
 
+	/**
+	 * @phpstan-impure
+	 */
 	public function getSignedShort() : int{
 		return Binary::readSignedShort($this->get(2));
 	}
@@ -126,10 +140,16 @@ class BinaryStream{
 		$this->buffer .= Binary::writeShort($v);
 	}
 
+	/**
+	 * @phpstan-impure
+	 */
 	public function getLShort() : int{
 		return Binary::readLShort($this->get(2));
 	}
 
+	/**
+	 * @phpstan-impure
+	 */
 	public function getSignedLShort() : int{
 		return Binary::readSignedLShort($this->get(2));
 	}
@@ -138,6 +158,9 @@ class BinaryStream{
 		$this->buffer .= Binary::writeLShort($v);
 	}
 
+	/**
+	 * @phpstan-impure
+	 */
 	public function getTriad() : int{
 		return Binary::readTriad($this->get(3));
 	}
@@ -146,6 +169,9 @@ class BinaryStream{
 		$this->buffer .= Binary::writeTriad($v);
 	}
 
+	/**
+	 * @phpstan-impure
+	 */
 	public function getLTriad() : int{
 		return Binary::readLTriad($this->get(3));
 	}
@@ -154,6 +180,9 @@ class BinaryStream{
 		$this->buffer .= Binary::writeLTriad($v);
 	}
 
+	/**
+	 * @phpstan-impure
+	 */
 	public function getInt() : int{
 		return Binary::readInt($this->get(4));
 	}
@@ -162,6 +191,9 @@ class BinaryStream{
 		$this->buffer .= Binary::writeInt($v);
 	}
 
+	/**
+	 * @phpstan-impure
+	 */
 	public function getLInt() : int{
 		return Binary::readLInt($this->get(4));
 	}
@@ -170,10 +202,16 @@ class BinaryStream{
 		$this->buffer .= Binary::writeLInt($v);
 	}
 
+	/**
+	 * @phpstan-impure
+	 */
 	public function getFloat() : float{
 		return Binary::readFloat($this->get(4));
 	}
 
+	/**
+	 * @phpstan-impure
+	 */
 	public function getRoundedFloat(int $accuracy) : float{
 		return Binary::readRoundedFloat($this->get(4), $accuracy);
 	}
@@ -182,10 +220,16 @@ class BinaryStream{
 		$this->buffer .= Binary::writeFloat($v);
 	}
 
+	/**
+	 * @phpstan-impure
+	 */
 	public function getLFloat() : float{
 		return Binary::readLFloat($this->get(4));
 	}
 
+	/**
+	 * @phpstan-impure
+	 */
 	public function getRoundedLFloat(int $accuracy) : float{
 		return Binary::readRoundedLFloat($this->get(4), $accuracy);
 	}
@@ -194,6 +238,9 @@ class BinaryStream{
 		$this->buffer .= Binary::writeLFloat($v);
 	}
 
+	/**
+	 * @phpstan-impure
+	 */
 	public function getDouble() : float{
 		return Binary::readDouble($this->get(8));
 	}
@@ -202,6 +249,9 @@ class BinaryStream{
 		$this->buffer .= Binary::writeDouble($v);
 	}
 
+	/**
+	 * @phpstan-impure
+	 */
 	public function getLDouble() : float{
 		return Binary::readLDouble($this->get(8));
 	}
@@ -210,6 +260,9 @@ class BinaryStream{
 		$this->buffer .= Binary::writeLDouble($v);
 	}
 
+	/**
+	 * @phpstan-impure
+	 */
 	public function getLong() : int{
 		return Binary::readLong($this->get(8));
 	}
@@ -218,6 +271,9 @@ class BinaryStream{
 		$this->buffer .= Binary::writeLong($v);
 	}
 
+	/**
+	 * @phpstan-impure
+	 */
 	public function getLLong() : int{
 		return Binary::readLLong($this->get(8));
 	}
@@ -228,6 +284,8 @@ class BinaryStream{
 
 	/**
 	 * Reads a 32-bit variable-length unsigned integer from the buffer and returns it.
+	 *
+	 * @phpstan-impure
 	 */
 	public function getUnsignedVarInt() : int{
 		return Binary::readUnsignedVarInt($this->buffer, $this->offset);
@@ -242,6 +300,8 @@ class BinaryStream{
 
 	/**
 	 * Reads a 32-bit zigzag-encoded variable-length integer from the buffer and returns it.
+	 *
+	 * @phpstan-impure
 	 */
 	public function getVarInt() : int{
 		return Binary::readVarInt($this->buffer, $this->offset);
@@ -256,6 +316,8 @@ class BinaryStream{
 
 	/**
 	 * Reads a 64-bit variable-length integer from the buffer and returns it.
+	 *
+	 * @phpstan-impure
 	 */
 	public function getUnsignedVarLong() : int{
 		return Binary::readUnsignedVarLong($this->buffer, $this->offset);
@@ -270,6 +332,8 @@ class BinaryStream{
 
 	/**
 	 * Reads a 64-bit zigzag-encoded variable-length integer from the buffer and returns it.
+	 *
+	 * @phpstan-impure
 	 */
 	public function getVarLong() : int{
 		return Binary::readVarLong($this->buffer, $this->offset);
