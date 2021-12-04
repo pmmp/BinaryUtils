@@ -33,11 +33,20 @@ use function pack;
 use function preg_replace;
 use function round;
 use function sprintf;
+use function strlen;
 use function substr;
 use function unpack;
 use const PHP_INT_MAX;
 
 class Binary{
+	public const SIZEOF_BYTE = 1;
+	public const SIZEOF_SHORT = 2;
+	public const SIZEOF_INT = 4;
+	public const SIZEOF_LONG = 8;
+
+	public const SIZEOF_FLOAT = 4;
+	public const SIZEOF_DOUBLE = 8;
+
 	public static function signByte(int $value) : int{
 		return $value << 56 >> 56;
 	}
@@ -76,13 +85,18 @@ class Binary{
 
 	/**
 	 * @return mixed[]
+	 * @throws BinaryDataException
 	 */
-	private static function safeUnpack(string $formatCode, string $bytes) : array{
+	private static function safeUnpack(string $formatCode, string $bytes, int $needLength) : array{
+		$haveLength = strlen($bytes);
+		if($haveLength < $needLength){
+			throw new BinaryDataException("Not enough bytes: need $needLength, have $haveLength");
+		}
 		//unpack SUCKS SO BADLY. We really need an extension to replace this garbage :(
 		$result = unpack($formatCode, $bytes);
 		if($result === false){
-			//assume the formatting code is valid, since we provided it
-			throw new BinaryDataException("Invalid input data (not enough?)");
+			//this should never happen; we checked the length above
+			throw new \AssertionError("unpack() failed for unknown reason");
 		}
 		return $result;
 	}
@@ -136,14 +150,14 @@ class Binary{
 	 * Reads a 16-bit unsigned big-endian number
 	 */
 	public static function readShort(string $str) : int{
-		return self::safeUnpack("n", $str)[1];
+		return self::safeUnpack("n", $str, self::SIZEOF_SHORT)[1];
 	}
 
 	/**
 	 * Reads a 16-bit signed big-endian number
 	 */
 	public static function readSignedShort(string $str) : int{
-		return self::signShort(self::safeUnpack("n", $str)[1]);
+		return self::signShort(self::safeUnpack("n", $str, self::SIZEOF_SHORT)[1]);
 	}
 
 	/**
@@ -157,14 +171,14 @@ class Binary{
 	 * Reads a 16-bit unsigned little-endian number
 	 */
 	public static function readLShort(string $str) : int{
-		return self::safeUnpack("v", $str)[1];
+		return self::safeUnpack("v", $str, self::SIZEOF_SHORT)[1];
 	}
 
 	/**
 	 * Reads a 16-bit signed little-endian number
 	 */
 	public static function readSignedLShort(string $str) : int{
-		return self::signShort(self::safeUnpack("v", $str)[1]);
+		return self::signShort(self::safeUnpack("v", $str, self::SIZEOF_SHORT)[1]);
 	}
 
 	/**
@@ -178,7 +192,7 @@ class Binary{
 	 * Reads a 3-byte big-endian number
 	 */
 	public static function readTriad(string $str) : int{
-		return self::safeUnpack("N", "\x00" . $str)[1];
+		return self::safeUnpack("N", "\x00" . $str, self::SIZEOF_INT)[1];
 	}
 
 	/**
@@ -192,7 +206,7 @@ class Binary{
 	 * Reads a 3-byte little-endian number
 	 */
 	public static function readLTriad(string $str) : int{
-		return self::safeUnpack("V", $str . "\x00")[1];
+		return self::safeUnpack("V", $str . "\x00", self::SIZEOF_INT)[1];
 	}
 
 	/**
@@ -206,7 +220,7 @@ class Binary{
 	 * Reads a 4-byte signed integer
 	 */
 	public static function readInt(string $str) : int{
-		return self::signInt(self::safeUnpack("N", $str)[1]);
+		return self::signInt(self::safeUnpack("N", $str, self::SIZEOF_INT)[1]);
 	}
 
 	/**
@@ -220,7 +234,7 @@ class Binary{
 	 * Reads a 4-byte signed little-endian integer
 	 */
 	public static function readLInt(string $str) : int{
-		return self::signInt(self::safeUnpack("V", $str)[1]);
+		return self::signInt(self::safeUnpack("V", $str, self::SIZEOF_INT)[1]);
 	}
 
 	/**
@@ -234,7 +248,7 @@ class Binary{
 	 * Reads a 4-byte floating-point number
 	 */
 	public static function readFloat(string $str) : float{
-		return self::safeUnpack("G", $str)[1];
+		return self::safeUnpack("G", $str, self::SIZEOF_FLOAT)[1];
 	}
 
 	/**
@@ -255,7 +269,7 @@ class Binary{
 	 * Reads a 4-byte little-endian floating-point number.
 	 */
 	public static function readLFloat(string $str) : float{
-		return self::safeUnpack("g", $str)[1];
+		return self::safeUnpack("g", $str, self::SIZEOF_FLOAT)[1];
 	}
 
 	/**
@@ -283,7 +297,7 @@ class Binary{
 	 * Reads an 8-byte floating-point number.
 	 */
 	public static function readDouble(string $str) : float{
-		return self::safeUnpack("E", $str)[1];
+		return self::safeUnpack("E", $str, self::SIZEOF_DOUBLE)[1];
 	}
 
 	/**
@@ -297,7 +311,7 @@ class Binary{
 	 * Reads an 8-byte little-endian floating-point number.
 	 */
 	public static function readLDouble(string $str) : float{
-		return self::safeUnpack("e", $str)[1];
+		return self::safeUnpack("e", $str, self::SIZEOF_DOUBLE)[1];
 	}
 
 	/**
@@ -311,7 +325,7 @@ class Binary{
 	 * Reads an 8-byte integer.
 	 */
 	public static function readLong(string $str) : int{
-		return self::safeUnpack("J", $str)[1];
+		return self::safeUnpack("J", $str, self::SIZEOF_LONG)[1];
 	}
 
 	/**
@@ -325,7 +339,7 @@ class Binary{
 	 * Reads an 8-byte little-endian integer.
 	 */
 	public static function readLLong(string $str) : int{
-		return self::safeUnpack("P", $str)[1];
+		return self::safeUnpack("P", $str, self::SIZEOF_LONG)[1];
 	}
 
 	/**
