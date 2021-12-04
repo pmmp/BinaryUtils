@@ -103,15 +103,25 @@ class Binary{
 
 	/**
 	 * Reads an unsigned byte (0 - 255)
+	 *
+	 * @throws BinaryDataException
 	 */
 	public static function readByte(string $c) : int{
+		if($c === ""){
+			throw new BinaryDataException("Expected a string of length 1");
+		}
 		return ord($c[0]);
 	}
 
 	/**
 	 * Reads a signed byte (-128 - 127)
+	 *
+	 * @throws BinaryDataException
 	 */
 	public static function readSignedByte(string $c) : int{
+		if($c === ""){
+			throw new BinaryDataException("Expected a string of length 1");
+		}
 		return self::signByte(ord($c[0]));
 	}
 

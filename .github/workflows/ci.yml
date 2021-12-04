@@ -27,3 +27,5 @@ jobs:
       run: composer install --prefer-dist --no-interaction
     - name: Run PHPStan
       run: ./vendor/bin/phpstan analyze --no-progress
+    - name: Run PHPUnit
+      run: ./vendor/bin/phpunit tests/phpunit --fail-on-warning
