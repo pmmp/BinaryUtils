@@ -39,7 +39,6 @@ use function unpack;
 use const PHP_INT_MAX;
 
 class Binary{
-	private const SIZEOF_BYTE = 1;
 	private const SIZEOF_SHORT = 2;
 	private const SIZEOF_INT = 4;
 	private const SIZEOF_LONG = 8;
