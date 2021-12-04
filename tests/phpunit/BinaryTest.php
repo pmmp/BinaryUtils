@@ -36,4 +36,19 @@ final class BinaryTest extends TestCase{
 		$this->expectException(BinaryDataException::class);
 		Binary::readSignedByte("");
 	}
+
+	/**
+	 * Passing too much data is OK; we just take the first N bytes as needed.
+	 */
+	public function testReadShortTooMuchData() : void{
+		$expected = 19132;
+		$data = Binary::writeShort($expected) . "\x00\x00";
+		$number = Binary::readShort($data);
+		self::assertSame($expected, $number);
+	}
+
+	public function testReadShortNotEnoughData() : void{
+		$this->expectException(BinaryDataException::class);
+		Binary::readShort("\x01");
+	}
 }
