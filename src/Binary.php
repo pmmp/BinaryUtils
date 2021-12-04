@@ -39,13 +39,13 @@ use function unpack;
 use const PHP_INT_MAX;
 
 class Binary{
-	public const SIZEOF_BYTE = 1;
-	public const SIZEOF_SHORT = 2;
-	public const SIZEOF_INT = 4;
-	public const SIZEOF_LONG = 8;
+	private const SIZEOF_BYTE = 1;
+	private const SIZEOF_SHORT = 2;
+	private const SIZEOF_INT = 4;
+	private const SIZEOF_LONG = 8;
 
-	public const SIZEOF_FLOAT = 4;
-	public const SIZEOF_DOUBLE = 8;
+	private const SIZEOF_FLOAT = 4;
+	private const SIZEOF_DOUBLE = 8;
 
 	public static function signByte(int $value) : int{
 		return $value << 56 >> 56;
