@@ -104,7 +104,7 @@ class Binary{
 	 * Reads a byte boolean
 	 */
 	public static function readBool(string $b) : bool{
-		return $b !== "\x00";
+		return $b[0] !== "\x00";
 	}
 
 	/**
