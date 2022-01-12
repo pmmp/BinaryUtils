@@ -432,16 +432,16 @@ class Binary{
 	 */
 	public static function writeUnsignedVarInt(int $value) : string{
 		$buf = "";
-		$value &= 0xffffffff;
+		$remaining = $value & 0xffffffff;
 		for($i = 0; $i < 5; ++$i){
-			if(($value >> 7) !== 0){
-				$buf .= chr($value | 0x80);
+			if(($remaining >> 7) !== 0){
+				$buf .= chr($remaining | 0x80);
 			}else{
-				$buf .= chr($value & 0x7f);
+				$buf .= chr($remaining & 0x7f);
 				return $buf;
 			}
 
-			$value = (($value >> 7) & (PHP_INT_MAX >> 6)); //PHP really needs a logical right-shift operator
+			$remaining = (($remaining >> 7) & (PHP_INT_MAX >> 6)); //PHP really needs a logical right-shift operator
 		}
 
 		throw new InvalidArgumentException("Value too large to be encoded as a VarInt");
@@ -496,15 +496,16 @@ class Binary{
 	 */
 	public static function writeUnsignedVarLong(int $value) : string{
 		$buf = "";
+		$remaining = $value;
 		for($i = 0; $i < 10; ++$i){
-			if(($value >> 7) !== 0){
-				$buf .= chr($value | 0x80); //Let chr() take the last byte of this, it's faster than adding another & 0x7f.
+			if(($remaining >> 7) !== 0){
+				$buf .= chr($remaining | 0x80); //Let chr() take the last byte of this, it's faster than adding another & 0x7f.
 			}else{
-				$buf .= chr($value & 0x7f);
+				$buf .= chr($remaining & 0x7f);
 				return $buf;
 			}
 
-			$value = (($value >> 7) & (PHP_INT_MAX >> 6)); //PHP really needs a logical right-shift operator
+			$remaining = (($remaining >> 7) & (PHP_INT_MAX >> 6)); //PHP really needs a logical right-shift operator
 		}
 
 		throw new InvalidArgumentException("Value too large to be encoded as a VarLong");
