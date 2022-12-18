@@ -18,7 +18,7 @@ jobs:
         php-version: ${{ matrix.php }}
     - name: Cache Composer packages
       id: composer-cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: "~/.composer/cache"
         key: "php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.json') }}"
