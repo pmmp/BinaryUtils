@@ -65,6 +65,8 @@ class BinaryStream{
 	/**
 	 * @phpstan-impure
 	 * @throws BinaryDataException if there are not enough bytes left in the buffer
+	 *
+	 * @phpstan-param int<0, max> $len
 	 */
 	public function get(int $len) : string{
 		if($len === 0){
