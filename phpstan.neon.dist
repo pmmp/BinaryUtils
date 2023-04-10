@@ -3,6 +3,7 @@ parameters:
 	paths:
 		- src
 		- tests/phpunit
+	treatPhpDocTypesAsCertain: false
 	ignoreErrors:
 		-
 			#this would only happen if the regex was broken
