@@ -23,8 +23,6 @@ declare(strict_types=1);
 
 namespace pocketmine\utils;
 
-#include <rules/BinaryIO.h>
-
 use function chr;
 use function ord;
 use function strlen;
