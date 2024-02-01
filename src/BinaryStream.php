@@ -28,9 +28,6 @@ use function is_string;
 use function round;
 
 class BinaryStream{
-	/** @var int */
-	protected $offset; //read offset only
-
 	private ByteBuffer $byteBuffer;
 
 	public function __construct(string $buffer = "", int $offset = 0){
@@ -74,7 +71,7 @@ class BinaryStream{
 	}
 
 	public function getOffset() : int{
-		return $this->offset;
+		return $this->byteBuffer->getReadOffset();
 	}
 
 	public function getBuffer() : string{
