@@ -24,7 +24,6 @@ declare(strict_types=1);
 namespace pocketmine\utils;
 
 use pmmp\encoding\ByteBuffer;
-use pmmp\encoding\DataDecodeException;
 use function is_string;
 use function round;
 
@@ -35,20 +34,16 @@ class BinaryStream{
 	private ByteBuffer $byteBuffer;
 
 	public function __construct(string $buffer = "", int $offset = 0){
-		$this->byteBuffer = new ByteBuffer();
-		//we can't pass the buffer directly to the constructor, as the constructor will set the write offset to 0, which
-		//would be inconsistent with the original BinaryStream implementation
-		$this->byteBuffer->writeByteArray($buffer);
-
-		$this->offset = $offset;
+		$this->byteBuffer = new ByteBuffer($buffer);
+		$this->byteBuffer->setReadOffset($offset);
 	}
 
 	public function __get(string $name) : mixed{
-		if($name === "buffer"){
-			return $this->byteBuffer->toString();
-		}
-
-		throw new \Error("Undefined property: " . static::class . "::$name");
+		return match($name){
+			"buffer" => $this->byteBuffer->toString(),
+			"offset" => $this->byteBuffer->getReadOffset(),
+			default => throw new \Error("Undefined property: " . static::class . "::$name")
+		};
 	}
 
 	public function __set(string $name, mixed $value) : void{
@@ -56,25 +51,26 @@ class BinaryStream{
 			if(!is_string($value)){
 				throw new \TypeError("Property " . static::class . "::$name expects string, " . gettype($value) . " given");
 			}
-			$this->byteBuffer = new ByteBuffer();
-			//we can't pass the buffer directly to the constructor, as the constructor will set the write offset to 0, which
-			//would be inconsistent with the original BinaryStream implementation
-			$this->byteBuffer->writeByteArray($value);
-			return;
+			$this->byteBuffer = new ByteBuffer($value);
+		}elseif($name === "offset"){
+			if(!is_int($value)){
+				throw new \TypeError("Property " . static::class . "::$name expects int, " . gettype($value) . " given");
+			}
+			$this->byteBuffer->setReadOffset($value);
+		}else{
+			throw new \Error("Undefined property: " . static::class . "::$name");
 		}
-
-		throw new \Error("Undefined property: " . static::class . "::$name");
 	}
 
 	/**
 	 * Rewinds the stream pointer to the start.
 	 */
 	public function rewind() : void{
-		$this->byteBuffer->rewind();
+		$this->byteBuffer->setReadOffset(0);
 	}
 
 	public function setOffset(int $offset) : void{
-		$this->offset = $offset;
+		$this->byteBuffer->setReadOffset($offset);
 	}
 
 	public function getOffset() : int{
@@ -83,51 +79,6 @@ class BinaryStream{
 
 	public function getBuffer() : string{
 		return $this->byteBuffer->toString();
-	}
-
-	/**
-	 * This ugly hack ensures that reading doesn't change the ByteBuffer's internal offset, as that's needed if someone
-	 * decides to write to the buffer. In addition, BinaryStream->setOffset() accepts invalid values that ByteBuffer
-	 * doesn't, so we have to track the read offset separately anyway.
-	 * @throws BinaryDataException
-	 */
-	private function seekReadOffset() : int{
-		try{
-			//ByteBuffer doesn't accept offsets beyond the end, so we need a hack to make the behaviour completely
-			//consistent with the original BinaryStream implementation
-			$oldOffset = $this->byteBuffer->getOffset();
-			$this->byteBuffer->setOffset($this->offset);
-			return $oldOffset;
-		}catch(\ValueError $e){
-			throw new BinaryDataException($e->getMessage(), 0, $e);
-		}
-	}
-
-	private function updateOffsets(int $oldWriteOffset) : void{
-		$this->offset = $this->byteBuffer->getOffset();
-
-		$this->byteBuffer->setOffset($oldWriteOffset); //internal ByteBuffer offset is only used for writing
-	}
-
-	/**
-	 * This hacky mess converts DataDecodeExceptions to BinaryDataExceptions, and also makes sure reading doesn't mess
-	 * with the ByteBuffer's internal offset (to allow the old write behaviour of BinaryStream to work uninterrupted).
-	 *
-	 * @phpstan-template T of int|float|string
-	 * @phpstan-param \Closure() : T $readFunc
-	 * @phpstan-return T
-	 *
-	 * @throws BinaryDataException
-	 */
-	private function readSimple(\Closure $readFunc) : int|float|string{
-		$writeOffset = $this->seekReadOffset();
-		try{
-			return $readFunc();
-		}catch(DataDecodeException $e){
-			throw new BinaryDataException($e->getMessage(), 0, $e);
-		}finally{
-			$this->updateOffsets($writeOffset);
-		}
 	}
 
 	/**
@@ -141,7 +92,7 @@ class BinaryStream{
 			throw new \InvalidArgumentException("Length must be positive");
 		}
 
-		return $this->readSimple(fn() => $this->byteBuffer->readByteArray($len));
+		return $this->byteBuffer->readByteArray($len);
 	}
 
 	/**
@@ -149,7 +100,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getRemaining() : string{
-		return $this->readSimple(fn() => $this->byteBuffer->readByteArray($this->byteBuffer->getUnreadLength()));
+		return $this->byteBuffer->readByteArray($this->byteBuffer->getUsedLength() - $this->byteBuffer->getReadOffset());
 	}
 
 	public function put(string $str) : void{
@@ -161,7 +112,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getBool() : bool{
-		return $this->readSimple($this->byteBuffer->readUnsignedByte(...)) !== 0;
+		return $this->byteBuffer->readUnsignedByte() !== 0;
 	}
 
 	public function putBool(bool $v) : void{
@@ -173,7 +124,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getByte() : int{
-		return $this->readSimple($this->byteBuffer->readUnsignedByte(...));
+		return $this->byteBuffer->readUnsignedByte();
 	}
 
 	public function putByte(int $v) : void{
@@ -185,7 +136,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getShort() : int{
-		return $this->readSimple($this->byteBuffer->readUnsignedShortBE(...));
+		return $this->byteBuffer->readUnsignedShortBE();
 	}
 
 	/**
@@ -193,7 +144,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getSignedShort() : int{
-		return $this->readSimple($this->byteBuffer->readSignedShortBE(...));
+		return $this->byteBuffer->readSignedShortBE();
 	}
 
 	public function putShort(int $v) : void{
@@ -205,7 +156,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getLShort() : int{
-		return $this->readSimple($this->byteBuffer->readUnsignedShortLE(...));
+		return $this->byteBuffer->readUnsignedShortLE();
 	}
 
 	/**
@@ -213,7 +164,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getSignedLShort() : int{
-		return $this->readSimple($this->byteBuffer->readSignedShortLE(...));
+		return $this->byteBuffer->readSignedShortLE();
 	}
 
 	public function putLShort(int $v) : void{
@@ -225,7 +176,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getTriad() : int{
-		return $this->readSimple($this->byteBuffer->readUnsignedTriadBE(...));
+		return $this->byteBuffer->readUnsignedTriadBE();
 	}
 
 	public function putTriad(int $v) : void{
@@ -237,7 +188,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getLTriad() : int{
-		return $this->readSimple($this->byteBuffer->readUnsignedTriadLE(...));
+		return $this->byteBuffer->readUnsignedTriadLE();
 	}
 
 	public function putLTriad(int $v) : void{
@@ -249,7 +200,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getInt() : int{
-		return $this->readSimple($this->byteBuffer->readSignedIntBE(...)); //wow, very inconsistency!
+		return $this->byteBuffer->readSignedIntBE(); //wow, very inconsistency!
 	}
 
 	public function putInt(int $v) : void{
@@ -261,7 +212,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getLInt() : int{
-		return $this->readSimple($this->byteBuffer->readSignedIntLE(...)); //wow, very inconsistency!
+		return $this->byteBuffer->readSignedIntLE(); //wow, very inconsistency!
 	}
 
 	public function putLInt(int $v) : void{
@@ -273,7 +224,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getFloat() : float{
-		return $this->readSimple($this->byteBuffer->readFloatBE(...));
+		return $this->byteBuffer->readFloatBE();
 	}
 
 	/**
@@ -294,7 +245,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getLFloat() : float{
-		return $this->readSimple($this->byteBuffer->readFloatLE(...));
+		return $this->byteBuffer->readFloatLE();
 	}
 
 	/**
@@ -315,7 +266,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getDouble() : float{
-		return $this->readSimple($this->byteBuffer->readDoubleBE(...));
+		return $this->byteBuffer->readDoubleBE();
 	}
 
 	public function putDouble(float $v) : void{
@@ -327,7 +278,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getLDouble() : float{
-		return $this->readSimple($this->byteBuffer->readDoubleLE(...));
+		return $this->byteBuffer->readDoubleLE();
 	}
 
 	public function putLDouble(float $v) : void{
@@ -339,7 +290,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getLong() : int{
-		return $this->readSimple($this->byteBuffer->readSignedLongBE(...));
+		return $this->byteBuffer->readSignedLongBE();
 	}
 
 	public function putLong(int $v) : void{
@@ -351,7 +302,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getLLong() : int{
-		return $this->readSimple($this->byteBuffer->readSignedLongLE(...));
+		return $this->byteBuffer->readSignedLongLE();
 	}
 
 	public function putLLong(int $v) : void{
@@ -365,7 +316,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getUnsignedVarInt() : int{
-		return $this->readSimple($this->byteBuffer->readUnsignedVarInt(...));
+		return $this->byteBuffer->readUnsignedVarInt();
 	}
 
 	/**
@@ -382,7 +333,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getVarInt() : int{
-		return $this->readSimple($this->byteBuffer->readSignedVarInt(...));
+		return $this->byteBuffer->readSignedVarInt();
 	}
 
 	/**
@@ -399,7 +350,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getUnsignedVarLong() : int{
-		return $this->readSimple($this->byteBuffer->readUnsignedVarLong(...));
+		return $this->byteBuffer->readUnsignedVarLong();
 	}
 
 	/**
@@ -416,7 +367,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getVarLong() : int{
-		return $this->readSimple($this->byteBuffer->readSignedVarLong(...));
+		return $this->byteBuffer->readSignedVarLong();
 	}
 
 	/**
@@ -430,16 +381,6 @@ class BinaryStream{
 	 * Returns whether the read offset has reached the end of the buffer.
 	 */
 	public function feof() : bool{
-		//TODO: this would be much simpler if ByteBuffer had a method to get the total length of its internal buffer
-		//we don't want to use toString() because it copies the buffer, which is a performance hit
-		$writeOffset = $this->byteBuffer->getOffset();
-		try{
-			$this->byteBuffer->setOffset($this->offset);
-			$result = $this->byteBuffer->getUnreadLength() === 0;
-			$this->byteBuffer->setOffset($writeOffset);
-			return $result;
-		}catch(\ValueError $e){
-			return true;
-		}
+		return $this->byteBuffer->getReadOffset() >= $this->byteBuffer->getUsedLength();
 	}
 }

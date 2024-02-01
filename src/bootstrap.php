@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace pocketmine\utils;
 
-class BinaryDataException extends \RuntimeException{
+use pmmp\encoding\DataDecodeException;
+use function class_alias;
 
-}
+class_alias(DataDecodeException::class, BinaryDataException::class);
