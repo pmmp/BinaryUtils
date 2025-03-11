@@ -36,6 +36,9 @@ class BinaryStream{
 	/** @var string */
 	protected $buffer;
 
+	private int $readOps = 0;
+	private int $readOpsLimit = 0;
+
 	public function __construct(string $buffer = "", int $offset = 0){
 		$this->buffer = $buffer;
 		$this->offset = $offset;
@@ -56,6 +59,45 @@ class BinaryStream{
 		return $this->offset;
 	}
 
+	/**
+	 * @internal Experimental, may be removed
+	 * Returns the total number of operations done on this BinaryStream so far
+	 * When this value exceeds the read cost limit (if set to a value > 0), a BinaryDataException will be thrown
+	 */
+	public function getReadOps() : int{
+		return $this->readOps;
+	}
+
+	/**
+	 * @internal Experimental, may be removed
+	 */
+	public function setReadOps(int $readOps) : void{
+		$this->readOps = $readOps;
+	}
+
+	private function addReadOps(int $amount) : void{
+		if($this->readOpsLimit > 0){
+			$this->readOps += $amount;
+			if($this->readOps > $this->readOpsLimit){
+				throw new BinaryDataException("Operations limit of $this->readOpsLimit exceeded, cannot process any more data");
+			}
+		}
+	}
+
+	/**
+	 * @internal Experimental, may be removed
+	 */
+	public function getReadOpsLimit() : int{
+		return $this->readOpsLimit;
+	}
+
+	/**
+	 * @internal Experimental, may be removed
+	 */
+	public function setReadOpsLimit(int $readOpsLimit) : void{
+		$this->readOpsLimit = $readOpsLimit;
+	}
+
 	public function getBuffer() : string{
 		return $this->buffer;
 	}
@@ -71,6 +113,7 @@ class BinaryStream{
 		if($len < 0){
 			throw new \InvalidArgumentException("Length must be positive");
 		}
+		$this->addReadOps(1);
 
 		$remaining = strlen($this->buffer) - $this->offset;
 		if($remaining < $len){
@@ -89,6 +132,7 @@ class BinaryStream{
 		if($this->offset >= $buflen){
 			throw new BinaryDataException("No bytes left to read");
 		}
+		$this->addReadOps(1);
 		$str = substr($this->buffer, $this->offset);
 		$this->offset = $buflen;
 		return $str;
@@ -305,6 +349,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getUnsignedVarInt() : int{
+		$this->addReadOps(5); //technically this could be 1-5, but varints are costly in any case
 		return Binary::readUnsignedVarInt($this->buffer, $this->offset);
 	}
 
@@ -322,6 +367,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getVarInt() : int{
+		$this->addReadOps(5);
 		return Binary::readVarInt($this->buffer, $this->offset);
 	}
 
@@ -339,6 +385,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getUnsignedVarLong() : int{
+		$this->addReadOps(10);
 		return Binary::readUnsignedVarLong($this->buffer, $this->offset);
 	}
 
@@ -346,6 +393,7 @@ class BinaryStream{
 	 * Writes a 64-bit variable-length integer to the end of the buffer.
 	 */
 	public function putUnsignedVarLong(int $v) : void{
+		$this->addReadOps(10);
 		$this->buffer .= Binary::writeUnsignedVarLong($v);
 	}
 
