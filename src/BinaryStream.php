@@ -393,7 +393,6 @@ class BinaryStream{
 	 * Writes a 64-bit variable-length integer to the end of the buffer.
 	 */
 	public function putUnsignedVarLong(int $v) : void{
-		$this->addReadOps(10);
 		$this->buffer .= Binary::writeUnsignedVarLong($v);
 	}
 
@@ -404,6 +403,7 @@ class BinaryStream{
 	 * @throws BinaryDataException
 	 */
 	public function getVarLong() : int{
+		$this->addReadOps(10);
 		return Binary::readVarLong($this->buffer, $this->offset);
 	}
 
