@@ -119,7 +119,7 @@ class BinaryStream{
 	}
 
 	public function putByte(int $v) : void{
-		$this->buffer .= chr($v);
+		$this->buffer .= chr($v & 0xff);
 	}
 
 	/**

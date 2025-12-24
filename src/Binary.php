@@ -142,7 +142,7 @@ class Binary{
 	 * Writes an unsigned/signed byte
 	 */
 	public static function writeByte(int $c) : string{
-		return chr($c);
+		return chr($c & 0xff);
 	}
 
 	/**
@@ -434,10 +434,11 @@ class Binary{
 		$buf = "";
 		$remaining = $value & 0xffffffff;
 		for($i = 0; $i < 5; ++$i){
+			$bits = $remaining & 0x7f;
 			if(($remaining >> 7) !== 0){
-				$buf .= chr($remaining | 0x80);
+				$buf .= chr($bits | 0x80);
 			}else{
-				$buf .= chr($remaining & 0x7f);
+				$buf .= chr($bits & 0x7f);
 				return $buf;
 			}
 
@@ -498,10 +499,11 @@ class Binary{
 		$buf = "";
 		$remaining = $value;
 		for($i = 0; $i < 10; ++$i){
+			$bits = $remaining & 0x7f;
 			if(($remaining >> 7) !== 0){
-				$buf .= chr($remaining | 0x80); //Let chr() take the last byte of this, it's faster than adding another & 0x7f.
+				$buf .= chr($bits | 0x80);
 			}else{
-				$buf .= chr($remaining & 0x7f);
+				$buf .= chr($bits & 0x7f);
 				return $buf;
 			}
 
